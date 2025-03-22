@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 400px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ddd;
+    }
+
+    #message-input {
+      padding: 10px;
+      border: none;
+      border-top: 1px solid #ddd;
+      font-size: 16px;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="chat-box"></div>
+    <input type="text" id="message-input" placeholder="Type your message...">
+  </div>
+
+  <script>
+    // Replace this with your WebSocket server URL
+    const ws = new WebSocket('wss://your-websocket-server-url');
+
+    const chatBox = document.getElementById('chat-box');
+    const messageInput = document.getElementById('message-input');
+
+    // Listen for messages from the server
+    ws.onmessage = (event) => {
+      const message = document.createElement('div');
+      message.textContent = event.data;
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the latest message
+    };
+
+    // Send a message when the user presses Enter
+    messageInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        const message = messageInput.value.trim();
+        if (message) {
+          ws.send(message);
+          messageInput.value = ''; // Clear the input field
+        }
+      }
+    });
+  </script>
+</body>
+</html>
