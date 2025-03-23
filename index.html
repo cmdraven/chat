@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2 Person Chat App</title>
+    <title>Hacker Chat App</title>
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
@@ -29,37 +29,112 @@
         const chatDiv = document.getElementById('chat');
         const messageInput = document.getElementById('message');
         const sendButton = document.getElementById('send');
+        const usernameInput = document.getElementById('username');
 
-        sendButton.addEventListener('click', () => {
+        // Sound effect for typing
+        const typingSound = new Audio('https://www.soundjay.com/button/beep-07.mp3'); // Replace with your sound file
+
+        // Function to send a message
+        const sendMessage = () => {
             const message = messageInput.value;
+            const username = usernameInput.value || "Anonymous";
             if (message) {
                 set(push(ref(database, 'messages')), {
+                    username: username,
                     message: message
                 }).catch((error) => {
                     console.error("Error sending message: ", error);
                 });
                 messageInput.value = '';
+                typingSound.play(); // Play sound on send
+            }
+        };
+
+        // Send message on button click
+        sendButton.addEventListener('click', sendMessage);
+
+        // Send message on Enter key press
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
             }
         });
 
+        // Listen for new messages
         onChildAdded(ref(database, 'messages'), (snapshot) => {
-            const message = snapshot.val().message;
+            const { username, message } = snapshot.val();
             const messageElement = document.createElement('div');
-            messageElement.textContent = message;
+            messageElement.textContent = `[${username}] > ${message}`;
             chatDiv.appendChild(messageElement);
             setTimeout(() => {
                 chatDiv.scrollTop = chatDiv.scrollHeight;
             }, 100);
+            typingSound.play(); // Play sound on receiving a message
         });
     </script>
     <style>
-        body { font-family: Arial, sans-serif; }
-        #chat { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
-        #message { width: 80%; }
+        /* Hacker GUI Style */
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: black;
+            color: limegreen;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: limegreen;
+            text-align: center;
+        }
+        #chat {
+            border: 2px solid limegreen;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            background-color: black;
+            color: limegreen;
+            font-family: 'Courier New', monospace;
+        }
+        #username {
+            width: 20%;
+            padding: 10px;
+            background-color: black;
+            color: limegreen;
+            border: 2px solid limegreen;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+        }
+        #message {
+            width: 60%;
+            padding: 10px;
+            background-color: black;
+            color: limegreen;
+            border: 2px solid limegreen;
+            font-family: 'Courier New', monospace;
+        }
+        #message::after {
+            content: '|';
+            animation: blink 1s steps(2, start) infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        #send {
+            padding: 10px 20px;
+            background-color: limegreen;
+            color: black;
+            border: none;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        #send:hover {
+            background-color: green;
+        }
     </style>
 </head>
 <body>
-    <h1>2 Person Chat App</h1>
+    <h1>Inferno</h1>
+    <input type="text" id="username" placeholder="Enter your username...">
     <div id="chat"></div>
     <input type="text" id="message" placeholder="Type your message here...">
     <button id="send">Send</button>
