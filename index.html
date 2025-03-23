@@ -47,21 +47,20 @@
         document.getElementById("send-button").addEventListener("click", sendMessage);
 
         const q = query(messagesRef, orderBy("timestamp"));
-        onSnapshot(q, (snapshot) => {
-            const chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML = "";
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (!data.timestamp) return; // Skip messages without a timestamp
-                let div = document.createElement("div");
-                div.textContent = data.text;
-                div.classList.add("message");
-                chatBox.appendChild(div);
-            });
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }, (error) => {
-            console.error("Error in snapshot listener:", error);
-        });
+       onSnapshot(q, (snapshot) => {
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML = "";
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        // Ensure that we display the message even if the timestamp is not present
+        let div = document.createElement("div");
+        div.textContent = data.text;
+        div.classList.add("message");
+        chatBox.appendChild(div);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight;
+});
+
     </script>
 </body>
 </html>
